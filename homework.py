@@ -3,6 +3,7 @@ import os
 import sys
 import time
 from http import HTTPStatus
+from typing import Dict, List
 
 import requests
 import telegram
@@ -21,10 +22,10 @@ TELEGRAM_CHAT_ID: str = os.getenv('TELEGRAM_CHAT_ID')
 
 RETRY_PERIOD: int = 600
 ENDPOINT: str = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
-HEADERS: dict[str, str] = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
+HEADERS: Dict = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
 
-HOMEWORK_VERDICTS: dict[str, str] = {
+HOMEWORK_VERDICTS: Dict = {
     'approved': 'Работа проверена: ревьюеру всё понравилось. Ура!',
     'reviewing': 'Работа взята на проверку ревьюером.',
     'rejected': 'Работа проверена: у ревьюера есть замечания.',
@@ -47,7 +48,7 @@ def send_message(bot: Bot, message: str) -> None:
                                           f'в Telegram: {error}')
 
 
-def get_api_answer(timestamp: int) -> list[str]:
+def get_api_answer(timestamp: int) -> List:
     """Запрос к эндпоинту API-сервиса."""
     cur_timestamp = timestamp or int(time.time())
     params = {'from_date': cur_timestamp}
@@ -66,7 +67,7 @@ def get_api_answer(timestamp: int) -> list[str]:
         )
 
 
-def check_response(response: dict[str, list]) -> list[str]:
+def check_response(response: Dict) -> List:
     """Проверка ответа API на корректность."""
     if not isinstance(response, dict):
         raise TypeError('Переменная не является словарем.')
@@ -79,7 +80,7 @@ def check_response(response: dict[str, list]) -> list[str]:
     return homeworks
 
 
-def parse_status(homework: list[str]) -> str:
+def parse_status(homework: List) -> str:
     """Извлечение информации о статусе домашней работы."""
     if 'homework_name' not in homework:
         raise KeyError('Данная работа отсутствует в списке.')
